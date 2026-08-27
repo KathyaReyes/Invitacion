@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Código Rojo · Parte de Ingreso</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Space+Mono:wght@400;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg-deep:#060b14;
+    --bg-panel:#0f1b2e;
+    --panel-border:#1e2d45;
+    --red-alert:#ff3b4e;
+    --red-alert-dim:#ff3b4e33;
+    --green-vital:#2fe6a0;
+    --green-vital-dim:#2fe6a022;
+    --amber:#ffb13c;
+    --text-primary:#eaf1fa;
+    --text-muted:#7e8ca6;
+    --font-display:'Space Grotesk', sans-serif;
+    --font-body:'Inter', sans-serif;
+    --font-mono:'Space Mono', monospace;
+  }
+
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+
+  html,body{
+    margin:0;
+    padding:0;
+    min-height:100vh;
+    background:
+      radial-gradient(circle at 20% -10%, #12233d 0%, transparent 45%),
+      radial-gradient(circle at 90% 110%, #1a1030 0%, transparent 40%),
+      var(--bg-deep);
+    color:var(--text-primary);
+    font-family:var(--font-body);
+    overflow-x:hidden;
+  }
+
+  body{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    padding:24px;
+  }
+
+  /* subtle background grid, like graph paper on a chart */
+  body::before{
+    content:"";
+    position:fixed;
+    inset:0;
+    background-image:
+      linear-gradient(rgba(255,255,255,0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255,255,255,0.025) 1px, transparent 1px);
+    background-size:28px 28px;
+    pointer-events:none;
+    z-index:0;
+  }
+
+  .stage{
+    position:relative;
+    width:100%;
+    max-width:480px;
+    z-index:1;
+  }
+
+  .card{
+    position:relative;
+    background:linear-gradient(180deg, var(--bg-panel), #0b1526);
+    border:1px solid var(--panel-border);
+    border-radius:22px;
+    padding:0 28px 34px;
+    box-shadow:0 30px 60px -20px rgba(0,0,0,0.7), 0 0 0 1px rgba(255,255,255,0.02) inset;
+    overflow:hidden;
+    animation:card-in .7s cubic-bezier(.2,.8,.25,1) both;
+  }
+
+  @keyframes card-in{
+    from{opacity:0; transform:translateY(18px) scale(.98);}
+    to{opacity:1; transform:translateY(0) scale(1);}
+  }
+
+  /* ---------- ECG signature strip ---------- */
+  .ecg-strip{
+    margin:0 -28px 6px;
+    height:64px;
+    background:#081020;
+    border-bottom:1px solid var(--panel-border);
+    overflow:hidden;
+    position:relative;
+  }
+  .ecg-strip svg{
+    position:absolute;
+    top:0; left:0;
+    height:100%;
+    width:200%;
+    animation:ecg-scroll 5.2s linear infinite;
+  }
+  @keyframes ecg-scroll{
+    from{transform:translateX(0);}
+    to{transform:translateX(-50%);}
+  }
+  .ecg-strip .label{
+    position:absolute;
+    top:8px; left:14px;
+    font-family:var(--font-mono);
+    font-size:10px;
+    letter-spacing:.12em;
+    color:var(--red-alert);
+    display:flex;
+    align-items:center;
+    gap:6px;
+    z-index:2;
+  }
+  .live-dot{
+    width:6px;height:6px;border-radius:50%;
+    background:var(--red-alert);
+    box-shadow:0 0 8px var(--red-alert);
+    animation:blink 1.1s ease-in-out infinite;
+  }
+  @keyframes blink{50%{opacity:.15;}}
+
+  /* ---------- header ---------- */
+  .eyebrow{
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    color:var(--text-muted);
+    text-transform:uppercase;
+    margin-top:18px;
+  }
+
+  h1.title{
+    font-family:var(--font-display);
+    font-weight:700;
+    font-size:clamp(2rem, 8vw, 2.6rem);
+    line-height:1.02;
+    margin:8px 0 4px;
+    color:var(--red-alert);
+    letter-spacing:-0.01em;
+    display:flex;
+    align-items:center;
+    gap:12px;
+  }
+  h1.title .pulse{
+    width:12px;height:12px;border-radius:50%;
+    background:var(--red-alert);
+    box-shadow:0 0 0 0 var(--red-alert-dim);
+    animation:pulse-ring 1.6s ease-out infinite;
+    flex:none;
+  }
+  @keyframes pulse-ring{
+    0%{box-shadow:0 0 0 0 rgba(255,59,78,.55);}
+    70%{box-shadow:0 0 0 14px rgba(255,59,78,0);}
+    100%{box-shadow:0 0 0 0 rgba(255,59,78,0);}
+  }
+
+  .subtitle{
+    font-family:var(--font-mono);
+    font-size:13px;
+    color:var(--text-muted);
+    margin-bottom:16px;
+  }
+
+  .chart-note{
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--panel-border);
+    border-left:3px solid var(--amber);
+    border-radius:10px;
+    padding:14px 16px;
+    font-size:14.5px;
+    line-height:1.55;
+    color:#cfd9e8;
+  }
+  .chart-note b{color:var(--text-primary);}
+
+  .divider{
+    display:flex;
+    align-items:center;
+    gap:10px;
+    margin:26px 0 14px;
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:.12em;
+    color:var(--text-muted);
+    text-transform:uppercase;
+  }
+  .divider::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:linear-gradient(90deg, var(--panel-border), transparent);
+  }
+
+  /* ---------- time selector ---------- */
+  .time-grid{
+    display:grid;
+    grid-template-columns:repeat(3, 1fr);
+    gap:10px;
+  }
+  .time-pill{
+    font-family:var(--font-mono);
+    font-size:15px;
+    font-weight:700;
+    color:var(--text-primary);
+    background:rgba(255,255,255,0.03);
+    border:1px solid var(--panel-border);
+    border-radius:12px;
+    padding:13px 8px;
+    cursor:pointer;
+    transition:transform .15s ease, border-color .15s ease, background .15s ease, box-shadow .15s ease;
+  }
+  .time-pill:hover{transform:translateY(-2px); border-color:#33507a;}
+  .time-pill.active{
+    background:var(--green-vital-dim);
+    border-color:var(--green-vital);
+    color:var(--green-vital);
+    box-shadow:0 0 0 3px rgba(47,230,160,0.08);
+  }
+  .time-caption{
+    margin-top:10px;
+    font-size:12.5px;
+    color:var(--text-muted);
+    min-height:16px;
+  }
+  .time-caption b{color:var(--green-vital); font-weight:600;}
+
+  /* ---------- question ---------- */
+  .question{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size:clamp(1.25rem, 5.5vw, 1.55rem);
+    margin:4px 0 18px;
+    color:var(--text-primary);
+  }
+
+  .btn-row{
+    display:flex;
+    gap:14px;
+    align-items:center;
+    position:relative;
+    min-height:58px;
+  }
+
+  .btn{
+    font-family:var(--font-body);
+    font-weight:600;
+    font-size:16px;
+    padding:15px 22px;
+    border-radius:12px;
+    border:none;
+    cursor:pointer;
+    transition:transform .12s ease, box-shadow .12s ease, filter .12s ease;
+  }
+  .btn:active{transform:scale(.96);}
+
+  .btn-yes{
+    flex:1;
+    background:linear-gradient(180deg, #35f0ab, #1fcf8e);
+    color:#052316;
+    box-shadow:0 10px 24px -8px rgba(47,230,160,0.55);
+  }
+  .btn-yes:hover{filter:brightness(1.06); transform:translateY(-1px);}
+
+  .btn-no{
+    background:var(--panel-border);
+    color:var(--text-muted);
+    position:relative;
+    z-index:5;
+    white-space:nowrap;
+  }
+  .btn-no.escaping{
+    position:fixed;
+    z-index:999;
+    box-shadow:0 8px 20px -6px rgba(0,0,0,.6);
+  }
+
+  .hint{
+    margin-top:14px;
+    font-size:12px;
+    color:var(--text-muted);
+    font-style:italic;
+    opacity:.8;
+  }
+
+  /* ---------- success screen ---------- */
+  .success{
+    display:none;
+    text-align:center;
+    padding-top:6px;
+  }
+  .success.show{display:block; animation:card-in .6s ease both;}
+
+  .flatline-wrap{
+    margin:0 -28px 18px;
+    height:64px;
+    background:#081020;
+    border-bottom:1px solid var(--panel-border);
+    overflow:hidden;
+    position:relative;
+  }
+  .flatline-wrap svg{
+    position:absolute; top:0; left:0; height:100%; width:200%;
+    animation:ecg-scroll 3.4s linear infinite;
+  }
+
+  .badge{
+    display:inline-flex;
+    align-items:center;
+    gap:8px;
+    font-family:var(--font-mono);
+    font-size:11px;
+    letter-spacing:.14em;
+    text-transform:uppercase;
+    color:var(--green-vital);
+    background:var(--green-vital-dim);
+    border:1px solid var(--green-vital);
+    border-radius:999px;
+    padding:6px 14px;
+    margin-bottom:14px;
+  }
+
+  .success h2{
+    font-family:var(--font-display);
+    font-size:clamp(1.6rem, 7vw, 2.1rem);
+    margin:0 0 12px;
+    color:var(--text-primary);
+  }
+
+  .success p.msg{
+    font-size:17px;
+    line-height:1.6;
+    color:#d7e2f0;
+    max-width:34ch;
+    margin:0 auto 6px;
+  }
+
+  .success .detail{
+    margin-top:16px;
+    font-family:var(--font-mono);
+    font-size:12.5px;
+    color:var(--text-muted);
+  }
+  .success .detail b{color:var(--amber);}
+
+  /* ---------- confetti ---------- */
+  #confetti-layer{
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    overflow:hidden;
+    z-index:1000;
+  }
+  .confetto{
+    position:absolute;
+    top:-10px;
+    border-radius:2px;
+    opacity:.95;
+    animation-name:fall;
+    animation-timing-function:linear;
+    animation-fill-mode:forwards;
+  }
+  @keyframes fall{
+    to{ transform:translateY(110vh) rotate(var(--rot)); opacity:0; }
+  }
+
+  @media (max-width:380px){
+    .card{padding:0 18px 26px;}
+    .ecg-strip, .flatline-wrap{margin:0 -18px 6px;}
+    .time-grid{gap:8px;}
+    .btn{padding:14px 16px; font-size:15px;}
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{animation-duration:0.001s !important; animation-iteration-count:1 !important; transition-duration:0.001s !important;}
+  }
+</style>
+</head>
+<body>
+
+<div class="stage">
+  <div class="card">
+
+    <!-- ===== PANTALLA PRINCIPAL ===== -->
+    <div id="mainScreen">
+      <div class="ecg-strip">
+        <span class="label"><span class="live-dot"></span> MONITOR · EN VIVO</span>
+        <svg viewBox="0 0 600 64" preserveAspectRatio="none">
+          <polyline fill="none" stroke="#ff3b4e" stroke-width="2"
+            points="0,32 40,32 55,32 62,10 70,54 78,32 100,32 140,32 155,32 162,10 170,54 178,32 200,32
+                    240,32 255,32 262,10 270,54 278,32 300,32 340,32 355,32 362,10 370,54 378,32 400,32
+                    440,32 455,32 462,10 470,54 478,32 500,32 540,32 555,32 562,10 570,54 578,32 600,32"/>
+        </svg>
+      </div>
+
+      <div class="eyebrow">INGRESO · EMERGENCIA</div>
+      <h1 class="title"><span class="pulse"></span>Código Rojo</h1>
+      <div class="subtitle">Paciente: TÚ · Prioridad: máxima</div>
+
+      <div class="chart-note">
+        <b>Diagnóstico:</b> déficit agudo de tiempo en pareja, con síntomas de exceso de trabajo y falta de citas.<br>
+        <b>Tratamiento indicado:</b> una salida fuera de la rutina (Hacer el Amor). Dosis única, mañana. Sin sustitutos genéricos.
+      </div>
+
+      <div class="divider">Horario de intervención</div>
+      <div class="time-grid">
+        <button class="time-pill" data-time="11:00 AM" onclick="selectTime(this)">11:00 AM</button>
+        <button class="time-pill" data-time="13:00 PM" onclick="selectTime(this)">13:00 PM</button>
+        <button class="time-pill" data-time="15:00 PM" onclick="selectTime(this)">15:00 PM</button>
+      </div>
+      <div class="time-caption" id="timeCaption">Selecciona un horario para admitir al paciente.</div>
+
+      <div class="divider">Consentimiento informado</div>
+      <div class="question">¿Aceptas el procedimiento, Msc Dra Katherine Reyes?</div>
+
+      <div class="btn-row" id="btnRow">
+        <button class="btn btn-yes" id="yesBtn" onclick="accept()">Sí, acepto</button>
+        <button class="btn btn-no" id="noBtn">No</button>
+      </div>
+      <div class="hint">* el botón "No" no está disponible por protocolo del hospital.</div>
+    </div>
+
+    <!-- ===== PANTALLA DE ÉXITO ===== -->
+    <div id="successScreen" class="success">
+      <div class="flatline-wrap">
+        <svg viewBox="0 0 600 64" preserveAspectRatio="none">
+          <polyline fill="none" stroke="#2fe6a0" stroke-width="2"
+            points="0,32 40,32 55,32 62,10 70,54 78,32 100,32 140,32 155,32 162,10 170,54 178,32 200,32
+                    240,32 255,32 262,10 270,54 278,32 300,32 340,32 355,32 362,10 370,54 378,32 400,32
+                    440,32 455,32 462,10 470,54 478,32 500,32 540,32 555,32 562,10 570,54 578,32 600,32"/>
+        </svg>
+      </div>
+      <div class="badge">✓ Alta médica · confirmado</div>
+      <h2>Ingreso admitido</h2>
+      <p class="msg">Excelente, espero la pases muy bien mañana.</p>
+      <div class="detail">Cita registrada para las <b id="finalTime">--:--</b> · presentarse sin bata ;)</div>
+    </div>
+
+  </div>
+</div>
+
+<div id="confetti-layer"></div>
+
+<script>
+  const WHATSAPP_NUMBER = "50231570671"; // <-- REEMPLAZAR por tu número real
+
+  let chosenTime = null;
+
+  function selectTime(el){
+    document.querySelectorAll('.time-pill').forEach(p => p.classList.remove('active'));
+    el.classList.add('active');
+    chosenTime = el.dataset.time;
+    document.getElementById('timeCaption').innerHTML = 'Horario confirmado: <b>' + chosenTime + '</b>';
+  }
+
+  /* ---------- botón trampa ---------- */
+  const noBtn = document.getElementById('noBtn');
+  const yesBtn = document.getElementById('yesBtn');
+  const margin = 14;
+
+  function escapeButton(){
+    const w = noBtn.offsetWidth || 90;
+    const h = noBtn.offsetHeight || 50;
+    const maxX = window.innerWidth - w - margin;
+    const maxY = window.innerHeight - h - margin;
+
+    const x = Math.max(margin, Math.random() * maxX);
+    const y = Math.max(margin, Math.random() * maxY);
+
+    if (!noBtn.classList.contains('escaping')) {
+      noBtn.classList.add('escaping');
+    }
+    noBtn.style.left = x + 'px';
+    noBtn.style.top = y + 'px';
+  }
+
+  ['mouseenter','mouseover','pointerenter','touchstart'].forEach(evt => {
+    noBtn.addEventListener(evt, function(e){
+      e.preventDefault && e.preventDefault();
+      escapeButton();
+    }, { passive:false });
+  });
+
+  window.addEventListener('resize', () => {
+    if (noBtn.classList.contains('escaping')) escapeButton();
+  });
+
+  /* ---------- aceptar ---------- */
+  function accept(){
+    // Si todavía no eligió horario, se lo pedimos antes de continuar.
+    if (!chosenTime){
+      document.getElementById('timeCaption').innerHTML =
+        '<b style="color:#ff3b4e;">Seleccioná un horario antes de aceptar ↑</b>';
+      document.querySelector('.time-grid').scrollIntoView({ behavior:'smooth', block:'center' });
+      return;
+    }
+
+    document.getElementById('finalTime').textContent = chosenTime;
+    document.getElementById('mainScreen').style.display = 'none';
+    document.getElementById('successScreen').classList.add('show');
+    launchConfetti();
+
+    // Armamos el mensaje pre-llenado y abrimos WhatsApp con la API de wa.me
+    const mensaje = `¡Código Rojo aceptado!  Acepto salir de la rutina, nos vemos a las ${chosenTime}`;
+    const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
+
+    // Pequeño delay para que se alcance a ver la pantalla de éxito antes de saltar a WhatsApp
+    setTimeout(() => {
+      window.open(whatsappURL, '_blank');
+    }, 1500);
+  }
+
+  /* ---------- confeti ---------- */
+  function launchConfetti(){
+    const layer = document.getElementById('confetti-layer');
+    const colors = ['#ff3b4e', '#2fe6a0', '#ffb13c', '#eaf1fa', '#35a7f0'];
+    const total = 120;
+
+    for (let i = 0; i < total; i++){
+      const piece = document.createElement('div');
+      piece.className = 'confetto';
+      const size = 6 + Math.random() * 6;
+      piece.style.width = size + 'px';
+      piece.style.height = (size * 0.4) + 'px';
+      piece.style.left = (Math.random() * 100) + 'vw';
+      piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+      piece.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+      const duration = 2.6 + Math.random() * 2.2;
+      const delay = Math.random() * 0.6;
+      piece.style.animationDuration = duration + 's';
+      piece.style.animationDelay = delay + 's';
+      layer.appendChild(piece);
+      setTimeout(() => piece.remove(), (duration + delay) * 1000 + 200);
+    }
+
+    // segunda ráfaga para efecto de celebración sostenido
+    setTimeout(() => {
+      for (let i = 0; i < 60; i++){
+        const piece = document.createElement('div');
+        piece.className = 'confetto';
+        const size = 5 + Math.random() * 5;
+        piece.style.width = size + 'px';
+        piece.style.height = (size * 0.4) + 'px';
+        piece.style.left = (Math.random() * 100) + 'vw';
+        piece.style.background = colors[Math.floor(Math.random() * colors.length)];
+        piece.style.setProperty('--rot', (Math.random() * 720 - 360) + 'deg');
+        const duration = 2.4 + Math.random() * 2;
+        piece.style.animationDuration = duration + 's';
+        layer.appendChild(piece);
+        setTimeout(() => piece.remove(), duration * 1000 + 200);
+      }
+    }, 700);
+  }
+</script>
+
+</body>
+</html>

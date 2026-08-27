@@ -395,25 +395,25 @@
         </svg>
       </div>
 
-      <div class="eyebrow">INGRESO · EMERGENCIA</div>
+      <div class="eyebrow">Parte de ingreso · Urgencias</div>
       <h1 class="title"><span class="pulse"></span>Código Rojo</h1>
       <div class="subtitle">Paciente: TÚ · Prioridad: máxima</div>
 
       <div class="chart-note">
-        <b>Diagnóstico:</b> déficit agudo de tiempo en pareja, con síntomas de exceso de trabajo y falta de citas.<br>
-        <b>Tratamiento indicado:</b> una salida fuera de la rutina (Hacer el Amor). Dosis única, mañana. Sin sustitutos genéricos.
+        <b>Diagnóstico:</b> déficit agudo de tiempo en pareja, con síntomas de exceso de guardias y falta de citas.<br>
+        <b>Tratamiento indicado:</b> una noche fuera de la rutina. Dosis única, mañana. Sin sustitutos genéricos.
       </div>
 
       <div class="divider">Horario de intervención</div>
       <div class="time-grid">
-        <button class="time-pill" data-time="11:00 AM" onclick="selectTime(this)">11:00 AM</button>
-        <button class="time-pill" data-time="13:00 PM" onclick="selectTime(this)">13:00 PM</button>
-        <button class="time-pill" data-time="15:00 PM" onclick="selectTime(this)">15:00 PM</button>
+        <button class="time-pill" data-time="19:00" onclick="selectTime(this)">19:00</button>
+        <button class="time-pill" data-time="20:00" onclick="selectTime(this)">20:00</button>
+        <button class="time-pill" data-time="21:00" onclick="selectTime(this)">21:00</button>
       </div>
-      <div class="time-caption" id="timeCaption">Selecciona un horario para admitir al paciente.</div>
+      <div class="time-caption" id="timeCaption">Selecciona un horario para admitir a la paciente.</div>
 
       <div class="divider">Consentimiento informado</div>
-      <div class="question">¿Aceptas el procedimiento, Msc Dra Katherine Reyes?</div>
+      <div class="question">¿Aceptas el procedimiento, doctora?</div>
 
       <div class="btn-row" id="btnRow">
         <button class="btn btn-yes" id="yesBtn" onclick="accept()">Sí, acepto</button>
@@ -435,7 +435,7 @@
       <div class="badge">✓ Alta médica · confirmado</div>
       <h2>Ingreso admitido</h2>
       <p class="msg">Excelente, espero la pases muy bien mañana.</p>
-      <div class="detail">Cita registrada para las <b id="finalTime">--:--</b> · presentarse sin bata ;)</div>
+      <div class="detail">Cita registrada para las <b id="finalTime">--:--</b> · presentarse sin bata</div>
     </div>
 
   </div>
@@ -444,7 +444,12 @@
 <div id="confetti-layer"></div>
 
 <script>
-  const WHATSAPP_NUMBER = "50231570671"; // <-- REEMPLAZAR por tu número real
+  /* =====================================================================
+     👉 COLOCÁ TU NÚMERO DE WHATSAPP ACÁ 👈
+     Formato: código de país + número, SIN "+", SIN espacios ni guiones.
+     Ejemplo Guatemala: "50212345678"  (502 = código de país, luego el número)
+     ===================================================================== */
+  const WHATSAPP_NUMBER = "50200000000"; // <-- REEMPLAZAR por tu número real
 
   let chosenTime = null;
 
@@ -497,19 +502,20 @@
       return;
     }
 
+    // Armamos el mensaje pre-llenado y el enlace de WhatsApp (API wa.me)
+    const mensaje = `¡Código Rojo aceptado! 🚨 Acepto salir de la rutina, nos vemos a las ${chosenTime}`;
+    const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
+
+    // IMPORTANTE: en navegadores móviles (iOS/Android) la apertura de un enlace
+    // externo solo se permite si ocurre de forma INMEDIATA dentro del clic del
+    // usuario. Si esto se retrasa con un setTimeout, el navegador lo bloquea
+    // como si fuera un pop-up. Por eso se abre aquí mismo, sin demora.
+    window.open(whatsappURL, '_blank');
+
     document.getElementById('finalTime').textContent = chosenTime;
     document.getElementById('mainScreen').style.display = 'none';
     document.getElementById('successScreen').classList.add('show');
     launchConfetti();
-
-    // Armamos el mensaje pre-llenado y abrimos WhatsApp con la API de wa.me
-    const mensaje = `¡Código Rojo aceptado!  Acepto salir de la rutina, nos vemos a las ${chosenTime}`;
-    const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
-
-    // Pequeño delay para que se alcance a ver la pantalla de éxito antes de saltar a WhatsApp
-    setTimeout(() => {
-      window.open(whatsappURL, '_blank');
-    }, 1500);
   }
 
   /* ---------- confeti ---------- */

@@ -397,11 +397,11 @@
 
       <div class="eyebrow">Ingreso · Emergencia</div>
       <h1 class="title"><span class="pulse"></span>Código Rojo</h1>
-      <div class="subtitle">Paciente: TÚ · Prioridad: Máxima</div>
+      <div class="subtitle">Paciente: TÚ · Prioridad: máxima</div>
 
       <div class="chart-note">
         <b>Diagnóstico:</b> déficit agudo de tiempo en pareja, con síntomas de exceso de trabajo y falta de citas.<br>
-        <b>Tratamiento indicado:</b> una salida fuera de la rutina (Hacer el Amor). Dosis única, mañana. Sin sustitutos genéricos.
+        <b>Tratamiento indicado:</b> una noche fuera de la rutina (Hacer el Amor). Dosis única, mañana. Sin sustitutos genéricos.
       </div>
 
       <div class="divider">Horario de intervención</div>
@@ -413,7 +413,7 @@
       <div class="time-caption" id="timeCaption">Selecciona un horario para admitir a la paciente.</div>
 
       <div class="divider">Consentimiento informado</div>
-      <div class="question">¿Aceptas el procedimiento, Msc Dra Katherina Reyes?</div>
+      <div class="question">¿Aceptas el procedimiento, doctora?</div>
 
       <div class="btn-row" id="btnRow">
         <button class="btn btn-yes" id="yesBtn" onclick="accept()">Sí, acepto</button>
@@ -502,16 +502,17 @@
       return;
     }
 
-    // Armamos el mensaje pre-llenado y el enlace de WhatsApp (API wa.me)
+    // 1) Armamos el mensaje y el enlace de WhatsApp (API wa.me)
     const mensaje = `¡Código Rojo aceptado! 🚨 Acepto salir de la rutina, nos vemos a las ${chosenTime}`;
     const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
 
-    // IMPORTANTE: en navegadores móviles (iOS/Android) la apertura de un enlace
-    // externo solo se permite si ocurre de forma INMEDIATA dentro del clic del
-    // usuario. Si esto se retrasa con un setTimeout, el navegador lo bloquea
-    // como si fuera un pop-up. Por eso se abre aquí mismo, sin demora.
+    // 2) Abrimos WhatsApp de inmediato, como la PRIMERA acción del clic
+    //    (nada de setTimeout ni de esperar a la web). El mensaje de
+    //    "que la pases bien" vive directamente en la conversación de WhatsApp.
     window.open(whatsappURL, '_blank');
 
+    // 3) Como detalle extra, dejamos la pantalla lista por si vuelve a la pestaña,
+    //    pero ya no es lo esencial: lo esencial ya pasó en WhatsApp.
     document.getElementById('finalTime').textContent = chosenTime;
     document.getElementById('mainScreen').style.display = 'none';
     document.getElementById('successScreen').classList.add('show');

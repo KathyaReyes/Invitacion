@@ -401,7 +401,7 @@
 
       <div class="chart-note">
         <b>Diagnóstico:</b> déficit agudo de tiempo en pareja, con síntomas de exceso de trabajo y falta de citas.<br>
-        <b>Tratamiento indicado:</b> una noche fuera de la rutina (Hacer el Amor). Dosis única, mañana. Sin sustitutos genéricos.
+        <b>Tratamiento indicado:</b> una cita fuera de la rutina (Hacer el Amor). Dosis única, mañana. Sin sustitutos genéricos.
       </div>
 
       <div class="divider">Horario de intervención</div>
@@ -413,7 +413,7 @@
       <div class="time-caption" id="timeCaption">Selecciona un horario para admitir a la paciente.</div>
 
       <div class="divider">Consentimiento informado</div>
-      <div class="question">¿Aceptas el procedimiento, doctora?</div>
+      <div class="question">¿Aceptas el procedimiento, Msc Dra Katherina Reyes?</div>
 
       <div class="btn-row" id="btnRow">
         <button class="btn btn-yes" id="yesBtn" onclick="accept()">Sí, acepto</button>
@@ -503,7 +503,7 @@
     }
 
     // 1) Armamos el mensaje y el enlace de WhatsApp (API wa.me)
-    const mensaje = `¡Código Rojo aceptado! 🚨 Acepto salir de la rutina, nos vemos a las ${chosenTime}`;
+    const mensaje = `¡Código Rojo aceptado! 🚨 Acepto salir de la rutina, nos vemos a las ${chosenTime}, Psdt: Regresa a la página para ver tu código de vestimenta`;
     const whatsappURL = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(mensaje)}`;
 
     // 2) Abrimos WhatsApp de inmediato, como la PRIMERA acción del clic
